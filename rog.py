@@ -39,6 +39,9 @@ class MyGame(arcade.Window):
         self.fps_x = 0
         self.fps_y = 0
 
+        self.target_x = 0
+        self.target_y = 0
+
     def setup(self):
         # Create your sprites and sprite lists here
         pass
@@ -52,21 +55,12 @@ class MyGame(arcade.Window):
         # the screen to the background color, and erase what we drew last frame.
         arcade.start_render()
 
-        # Process frame rate data
         # Increment our frame counter
         self.frames += 1
 
-        # Record the current time in seconds
-        time_new = int(time.time())
-
-        # If the second have changed update the last FPS
-        if time_new != self.last_fps_time:
-            self.last_fps_time = time_new
-            self.fps = self.frames - self.last_fps_frames
-            self.last_fps_frames = self.frames
-
-        # Draw our framerate data
-        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y, arcade.color.BLACK, 12)
+        # start drawing
+        self.draw_bird(10, 30)
+        self.draw_fps()
 
         # Call draw() on all your sprite lists below
 
@@ -97,8 +91,8 @@ class MyGame(arcade.Window):
         """
         Called whenever the mouse moves.
         """
-        self.fps_x = x
-        self.fps_y = y
+        self.target_x = x
+        self.target_y = y
         pass
 
     def on_mouse_press(self, x, y, button, key_modifiers):
@@ -112,6 +106,36 @@ class MyGame(arcade.Window):
         Called when a user releases a mouse button.
         """
         pass
+
+    def draw_bird(self, x, y):
+        """
+        Draw a bird using a couple arcs.
+        """
+        arcade.draw_arc_outline(x, y, 20, 20, arcade.color.BLACK, 0, 90)
+        arcade.draw_arc_outline(x + 40, y, 20, 20, arcade.color.BLACK, 90, 180)
+
+    def draw_fps(self):
+        """
+        Draw the FPS counter
+
+        """
+
+        # Record the current time in seconds
+        time_new = int(time.time())
+
+        # If the second have changed update the last FPS
+        if time_new != self.last_fps_time:
+            self.last_fps_time = time_new
+            self.fps = self.frames - self.last_fps_frames
+            self.last_fps_frames = self.frames
+
+        # Draw our FPS data
+        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y, arcade.color.BLACK, 12)
+
+    def draw_crosshair(self):
+        # Draw a point at the target
+        arcade.draw_line(self.target_x - 32, self.target_y, self.target_x + 32, self.target_y, arcade.color.RED, 4)
+        arcade.draw_point(self.target_x, self.target_y, arcade.color.RED, 20)
 
 
 def main():
