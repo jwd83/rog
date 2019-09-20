@@ -7,6 +7,7 @@ http://arcade.academy/examples/starting_template.html#starting-template
 
 """
 
+import random
 # standard libraries
 import time
 
@@ -69,12 +70,29 @@ class MyGame(arcade.Window):
         self.bird_x = 10
         self.bird_y = 10
 
-        self.player_sprite = arcade.Sprite("images/bio-tier1.png", 1)
+        self.player_sprite = arcade.Sprite("images/bio-tier2.png", 1)
         self.player_sprite.center_x = int(SCREEN_WIDTH / 2)
         self.player_sprite.center_y = int(SCREEN_HEIGHT / 2)
 
-
         self.player_list.append(self.player_sprite)
+
+        for i in range(15):
+            star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
+            star.center_y = random.randrange(0, SCREEN_HEIGHT)
+            star.center_x = random.randrange(0, SCREEN_WIDTH)
+            self.star_list.append(star)
+
+        for i in range(15):
+            star = arcade.Sprite("images/star_black.png", random.uniform(0.03, 0.15))
+            star.center_y = random.randrange(0, SCREEN_HEIGHT)
+            star.center_x = random.randrange(0, SCREEN_WIDTH)
+            self.star_list.append(star)
+
+        # for i in range(15):
+        #     star = arcade.Sprite("images/star_blue.png", random.uniform(0.01, 0.02))
+        #     star.center_y = random.randrange(0, SCREEN_HEIGHT)
+        #     star.center_x = random.randrange(0, SCREEN_WIDTH)
+        #     self.star_list.append(star)
 
     def on_draw(self):
         """
@@ -106,11 +124,18 @@ class MyGame(arcade.Window):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        self.player_sprite.angle += 1
-        self.player_sprite.scale *= 0.999
+        # self.player_sprite.angle += 1
+        # self.player_sprite.scale *= 0.999
 
         self.bird_x += 1
         self.bird_y += 1
+
+        for star in self.star_list:
+            star.center_y -= star.scale * 100
+
+            if star.center_y < -100:
+                star.center_y = SCREEN_HEIGHT + 100
+                star.center_x = random.randrange(0, SCREEN_WIDTH)
 
         if self.bird_x > SCREEN_WIDTH:
             self.bird_x = 0
