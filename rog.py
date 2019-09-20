@@ -69,9 +69,12 @@ class MyGame(arcade.Window):
         self.bird_x = 10
         self.bird_y = 10
 
-        self.player_x = int(SCREEN_WIDTH / 2)
-        self.player_y = int(SCREEN_HEIGHT / 2)
         self.player_sprite = arcade.Sprite("images/bio-tier1.png", 1)
+        self.player_sprite.center_x = int(SCREEN_WIDTH / 2)
+        self.player_sprite.center_y = int(SCREEN_HEIGHT / 2)
+
+
+        self.player_list.append(self.player_sprite)
 
     def on_draw(self):
         """
@@ -85,17 +88,17 @@ class MyGame(arcade.Window):
         # Increment our frame counter
         self.frames += 1
 
-        # start drawing
+        # Draw our sprite lists from bottom to top
+        self.star_list.draw()
+        self.enemy_list.draw()
+        self.player_list.draw()
+
+        # Misc. drawing
         self.draw_bird(self.bird_x, self.bird_y)
         self.draw_fps()
 
-        self.draw_player()
-
-        # Call draw() on all your sprite lists below
-
     def draw_player(self):
         pass
-
 
     def update(self, delta_time):
         """
@@ -103,12 +106,16 @@ class MyGame(arcade.Window):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
+        self.player_sprite.angle += 1
+        self.player_sprite.scale *= 0.999
 
         self.bird_x += 1
         self.bird_y += 1
 
-        if self.bird_x > SCREEN_WIDTH: self.bird_x = 0
-        if self.bird_y > SCREEN_HEIGHT: self.bird_y = 0
+        if self.bird_x > SCREEN_WIDTH:
+            self.bird_x = 0
+        if self.bird_y > SCREEN_HEIGHT:
+            self.bird_y = 0
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -168,9 +175,10 @@ class MyGame(arcade.Window):
             self.last_fps_frames = self.frames
 
         # Draw our FPS data
-        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y, arcade.color.WHITE, 12)
+        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y,
+                         arcade.color.WHITE, 12)
 
-    def draw_crosshair(self):
+    def draw_reticle(self):
         # Draw a point at the target
         arcade.draw_line(self.target_x - 32, self.target_y, self.target_x + 32, self.target_y, arcade.color.RED, 4)
         arcade.draw_point(self.target_x, self.target_y, arcade.color.RED, 20)
