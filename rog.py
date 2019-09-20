@@ -6,9 +6,15 @@ Built with care upon the official Arcade reference template found at
 http://arcade.academy/examples/starting_template.html#starting-template
 
 """
+
+# standard libraries
 import time
 
+# external libraries
 import arcade
+
+# my libraries
+# import something
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -27,27 +33,45 @@ class MyGame(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.BLACK)
 
         # If you have sprite lists, you should create them here,
         # and set them to None
+
+        # sprite lists
+        self.player_list = None
+        self.star_list = None
+        self.enemy_list = None
+
+        self.player_sprite = None
+        self.player_x = 0
+        self.player_y = 0
+
         self.frames = 0
         self.last_fps_time = int(time.time())
         self.last_fps_frames = 0
         self.fps = 0
-
         self.fps_x = 0
         self.fps_y = 0
 
-        self.bird_x = 10
-        self.bird_y = 10
+        self.bird_x = 0
+        self.bird_y = 0
 
         self.target_x = 0
         self.target_y = 0
 
     def setup(self):
         # Create your sprites and sprite lists here
-        pass
+        self.enemy_list = arcade.SpriteList()
+        self.player_list = arcade.SpriteList()
+        self.star_list = arcade.SpriteList()
+
+        self.bird_x = 10
+        self.bird_y = 10
+
+        self.player_x = int(SCREEN_WIDTH / 2)
+        self.player_y = int(SCREEN_HEIGHT / 2)
+        self.player_sprite = arcade.Sprite("images/bio-tier1.png", 1)
 
     def on_draw(self):
         """
@@ -65,7 +89,13 @@ class MyGame(arcade.Window):
         self.draw_bird(self.bird_x, self.bird_y)
         self.draw_fps()
 
+        self.draw_player()
+
         # Call draw() on all your sprite lists below
+
+    def draw_player(self):
+        pass
+
 
     def update(self, delta_time):
         """
@@ -76,7 +106,10 @@ class MyGame(arcade.Window):
 
         self.bird_x += 1
         self.bird_y += 1
-        
+
+        if self.bird_x > SCREEN_WIDTH: self.bird_x = 0
+        if self.bird_y > SCREEN_HEIGHT: self.bird_y = 0
+
     def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
@@ -116,8 +149,8 @@ class MyGame(arcade.Window):
         """
         Draw a bird using a couple arcs.
         """
-        arcade.draw_arc_outline(x, y, 20, 20, arcade.color.BLACK, 0, 90)
-        arcade.draw_arc_outline(x + 40, y, 20, 20, arcade.color.BLACK, 90, 180)
+        arcade.draw_arc_outline(x, y, 20, 20, arcade.color.GREEN, 0, 90)
+        arcade.draw_arc_outline(x + 40, y, 20, 20, arcade.color.GREEN, 90, 180)
 
     def draw_fps(self):
         """
@@ -135,7 +168,7 @@ class MyGame(arcade.Window):
             self.last_fps_frames = self.frames
 
         # Draw our FPS data
-        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y, arcade.color.BLACK, 12)
+        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y, arcade.color.WHITE, 12)
 
     def draw_crosshair(self):
         # Draw a point at the target
