@@ -39,6 +39,9 @@ class MyGame(arcade.Window):
         self.fps_x = 0
         self.fps_y = 0
 
+        self.bird_x = 10
+        self.bird_y = 10
+
         self.target_x = 0
         self.target_y = 0
 
@@ -59,7 +62,7 @@ class MyGame(arcade.Window):
         self.frames += 1
 
         # start drawing
-        self.draw_bird(10, 30)
+        self.draw_bird(self.bird_x, self.bird_y)
         self.draw_fps()
 
         # Call draw() on all your sprite lists below
@@ -70,8 +73,10 @@ class MyGame(arcade.Window):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        pass
 
+        self.bird_x += 1
+        self.bird_y += 1
+        
     def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
