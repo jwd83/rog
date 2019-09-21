@@ -55,9 +55,6 @@ class MyGame(arcade.Window):
         self.fps_x = 0
         self.fps_y = 0
 
-        self.bird_x = 0
-        self.bird_y = 0
-
         self.target_x = 0
         self.target_y = 0
 
@@ -67,10 +64,7 @@ class MyGame(arcade.Window):
         self.player_list = arcade.SpriteList()
         self.star_list = arcade.SpriteList()
 
-        self.bird_x = 10
-        self.bird_y = 10
-
-        self.player_sprite = arcade.Sprite("images/bio-tier2.png", 1)
+        self.player_sprite = arcade.Sprite("images/marauder.png", 1)
         self.player_sprite.center_x = int(SCREEN_WIDTH / 2)
         self.player_sprite.center_y = int(SCREEN_HEIGHT / 2)
 
@@ -111,8 +105,6 @@ class MyGame(arcade.Window):
         self.enemy_list.draw()
         self.player_list.draw()
 
-        # Misc. drawing
-        self.draw_bird(self.bird_x, self.bird_y)
         self.draw_fps()
 
     def draw_player(self):
@@ -124,11 +116,8 @@ class MyGame(arcade.Window):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        # self.player_sprite.angle += 1
+        self.player_sprite.angle += 1
         # self.player_sprite.scale *= 0.999
-
-        self.bird_x += 1
-        self.bird_y += 1
 
         for star in self.star_list:
             star.center_y -= star.scale * 100
@@ -136,11 +125,6 @@ class MyGame(arcade.Window):
             if star.center_y < -100:
                 star.center_y = SCREEN_HEIGHT + 100
                 star.center_x = random.randrange(0, SCREEN_WIDTH)
-
-        if self.bird_x > SCREEN_WIDTH:
-            self.bird_x = 0
-        if self.bird_y > SCREEN_HEIGHT:
-            self.bird_y = 0
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -176,13 +160,6 @@ class MyGame(arcade.Window):
         Called when a user releases a mouse button.
         """
         pass
-
-    def draw_bird(self, x, y):
-        """
-        Draw a bird using a couple arcs.
-        """
-        arcade.draw_arc_outline(x, y, 20, 20, arcade.color.GREEN, 0, 90)
-        arcade.draw_arc_outline(x + 40, y, 20, 20, arcade.color.GREEN, 90, 180)
 
     def draw_fps(self):
         """
