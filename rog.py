@@ -7,15 +7,17 @@ http://arcade.academy/examples/starting_template.html#starting-template
 
 """
 
+# standard libraries in alphabetical order
 import random
-# standard libraries
 import time
 
-# external libraries
+# external libraries in alphabetical order
 import arcade
 
-# my libraries
+# my local libraries in alphabetical order
 # import something
+
+# global constants
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -97,14 +99,13 @@ class MyGame(arcade.Window):
         # the screen to the background color, and erase what we drew last frame.
         arcade.start_render()
 
-        # Increment our frame counter
-        self.frames += 1
-
         # Draw our sprite lists from bottom to top
         self.star_list.draw()
         self.enemy_list.draw()
         self.player_list.draw()
 
+        # Increment our frame counter and draw FPS data
+        self.frames += 1
         self.draw_fps()
 
     def draw_player(self):
