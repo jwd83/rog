@@ -9,6 +9,7 @@ http://arcade.academy/examples/starting_template.html#starting-template
 
 # standard libraries in alphabetical order
 import math
+import random
 import time
 
 # external libraries in alphabetical order
@@ -85,7 +86,8 @@ class MyGame(arcade.Window):
         self.star_list = arcade.SpriteList()
 
         # create the player sprite and append it to the player list
-        self.player_sprite = arcade.Sprite("images/marauder.png", 1)
+        # self.player_sprite = arcade.Sprite("images/marauder.png", 1)
+        self.player_sprite = arcade.Sprite("images/bio-tier1.png", 0.5)
         self.player_sprite.center_x = int(SCREEN_WIDTH / 2)
         self.player_sprite.center_y = int(SCREEN_HEIGHT / 2)
         self.player_list.append(self.player_sprite)
@@ -94,13 +96,13 @@ class MyGame(arcade.Window):
         self.world_map_sprite = arcade.Sprite("images/jupiter.jpg")
         self.world_map_sprite.scale = 1
         self.world_map_list.append(self.world_map_sprite)
-        #
-        # for i in range(15):
-        #     star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
-        #     star.center_y = random.randrange(0, SCREEN_HEIGHT)
-        #     star.center_x = random.randrange(0, SCREEN_WIDTH)
-        #     self.star_list.append(star)
-        #
+        
+        for i in range(15):
+            star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
+            star.center_y = random.randrange(0, SCREEN_HEIGHT)
+            star.center_x = random.randrange(0, SCREEN_WIDTH)
+            self.star_list.append(star)
+        
         # for i in range(15):
         #     star = arcade.Sprite("images/star_black.png", random.uniform(0.03, 0.15))
         #     star.center_y = random.randrange(0, SCREEN_HEIGHT)
@@ -124,9 +126,19 @@ class MyGame(arcade.Window):
 
         # Draw our sprite lists from bottom to top
         self.world_map_list.draw()
-        # self.star_list.draw()
+        self.star_list.draw()
         self.enemy_list.draw()
         self.player_list.draw()
+
+        if self.player_thrust_x != 0 or self.player_thrust_y != 0:
+            arcade.draw_line(
+                self.player_sprite.center_x, 
+                self.player_sprite.center_y, 
+                self.player_sprite.center_x - self.player_thrust_x, 
+                self.player_sprite.center_y + self.player_thrust_y,
+                arcade.color.RED,
+                5
+            )
 
         # Increment our frame counter and draw FPS data
         self.frames += 1
