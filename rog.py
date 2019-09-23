@@ -22,7 +22,10 @@ import arcade
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SCREEN_TITLE = "R.o.G."
-
+THRUST_MAX = 400
+THRUST_MIN = -100
+THRUST_ACCELERATION = 150
+SPIN_RATE = 200
 
 class MyGame(arcade.Window):
     """
@@ -42,13 +45,18 @@ class MyGame(arcade.Window):
         # and set them to None
 
         # sprite lists
+        self.world_map_list = None
         self.player_list = None
         self.star_list = None
         self.enemy_list = None
 
+        self.world_map_sprite = None
         self.player_sprite = None
-        self.player_x = 0
-        self.player_y = 0
+
+        self.player_location_x = 0
+        self.player_location_y = 0
+        self.player_thrust_value = 0
+        self.player_thrust_angle = 0
 
         self.frames = 0
         self.last_fps_time = int(time.time())
@@ -60,17 +68,29 @@ class MyGame(arcade.Window):
         self.target_x = 0
         self.target_y = 0
 
+        # Create control flags to track the current state of what key is pressed
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
+
     def setup(self):
         # Create your sprites and sprite lists here
+        self.world_map_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.star_list = arcade.SpriteList()
 
+        # create the player sprite and append it to the player list
         self.player_sprite = arcade.Sprite("images/marauder.png", 1)
         self.player_sprite.center_x = int(SCREEN_WIDTH / 2)
         self.player_sprite.center_y = int(SCREEN_HEIGHT / 2)
-
         self.player_list.append(self.player_sprite)
+
+        # create the world map sprite and append it to the world map list
+        self.world_map_sprite = arcade.Sprite("images/jupiter.jpg")
+        self.world_map_sprite.scale = 1
+        self.world_map_list.append(self.world_map_sprite)
 
         for i in range(15):
             star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
@@ -100,6 +120,7 @@ class MyGame(arcade.Window):
         arcade.start_render()
 
         # Draw our sprite lists from bottom to top
+        self.world_map_list.draw()
         self.star_list.draw()
         self.enemy_list.draw()
         self.player_list.draw()
@@ -117,15 +138,35 @@ class MyGame(arcade.Window):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        self.player_sprite.angle += 1
+        # self.player_sprite.angle += 1
         # self.player_sprite.scale *= 0.999
 
-        for star in self.star_list:
-            star.center_y -= star.scale * 100
+        # for star in self.star_list:
+        #     star.center_y -= star.scale * 100
+        #
+        #     if star.center_y < -100:
+        #         star.center_y = SCREEN_HEIGHT + 100
+        #         star.center_x = random.randrange(0, SCREEN_WIDTH)
 
-            if star.center_y < -100:
-                star.center_y = SCREEN_HEIGHT + 100
-                star.center_x = random.randrange(0, SCREEN_WIDTH)
+        if self.up_pressed:
+            self.player_thrust_value += delta_time * THRUST_ACCELERATION
+
+        if self.down_pressed:
+            self.player_thrust_value -= delta_time * THRUST_ACCELERATION
+
+        if self.left_pressed:
+            self.player_sprite.angle += delta_time * SPIN_RATE
+
+        if self.right_pressed:
+            self.player_sprite.angle -= delta_time * SPIN_RATE
+
+        if self.player_thrust_value > THRUST_MAX:
+            self.player_thrust_value = THRUST_MAX
+
+        if self.player_thrust_value < THRUST_MIN:
+            self.player_thrust_value = THRUST_MIN
+
+        self.world_map_sprite.center_y -= self.player_thrust_value * delta_time
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -134,13 +175,28 @@ class MyGame(arcade.Window):
         For a full list of keys, see:
         http://arcade.academy/arcade.key.html
         """
-        pass
+
+        if key == arcade.key.UP:
+            self.up_pressed = True
+        elif key == arcade.key.DOWN:
+            self.down_pressed = True
+        elif key == arcade.key.LEFT:
+            self.left_pressed = True
+        elif key == arcade.key.RIGHT:
+            self.right_pressed = True
 
     def on_key_release(self, key, key_modifiers):
         """
         Called whenever the user lets off a previously pressed key.
         """
-        pass
+        if key == arcade.key.UP:
+            self.up_pressed = False
+        elif key == arcade.key.DOWN:
+            self.down_pressed = False
+        elif key == arcade.key.LEFT:
+            self.left_pressed = False
+        elif key == arcade.key.RIGHT:
+            self.right_pressed = False
 
     def on_mouse_motion(self, x, y, delta_x, delta_y):
         """
@@ -178,7 +234,7 @@ class MyGame(arcade.Window):
             self.last_fps_frames = self.frames
 
         # Draw our FPS data
-        arcade.draw_text("FPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y,
+        arcade.draw_text("Thrust: " + str(self.player_thrust_value) + "\nFPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y,
                          arcade.color.WHITE, 12)
 
     def draw_reticle(self):
