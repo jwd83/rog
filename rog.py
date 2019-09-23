@@ -24,8 +24,8 @@ SCREEN_HEIGHT = 720
 SCREEN_TITLE = "R.o.G."
 THRUST_MAX = 400
 THRUST_MIN = -50
-THRUST_ACCELERATION = 25
-SPIN_RATE = 100
+THRUST_ACCELERATION = 10
+SPIN_RATE = 125
 
 
 class MyGame(arcade.Window):
@@ -173,22 +173,11 @@ class MyGame(arcade.Window):
                 thrust_angle -= 360
 
             thrust_component_x = math.cos(math.radians(180 - thrust_angle)) * thrust_contribution
-            thrust_component_y = math.sin(math.radians(180 -thrust_angle)) * thrust_contribution
+            thrust_component_y = math.sin(math.radians(180 - thrust_angle)) * thrust_contribution
 
             self.player_thrust_x += thrust_component_x
             self.player_thrust_y += thrust_component_y
 
-        #
-        #
-        # if self.player_thrust_value > THRUST_MAX:
-        #     self.player_thrust_value = THRUST_MAX
-        #
-        # if self.player_thrust_value < THRUST_MIN:
-        #     self.player_thrust_value = THRUST_MIN
-
-        # apply thrust movement
-
-        # needs to be rewritten to use thrust value and angle
         self.world_map_sprite.center_x += self.player_thrust_x
         self.world_map_sprite.center_y -= self.player_thrust_y
 
@@ -260,11 +249,11 @@ class MyGame(arcade.Window):
         # Draw our FPS data
         arcade.draw_text(
             # Text
-            "Coordinates: " + str(self.world_map_sprite.center_x) + ", " + str(0 - self.world_map_sprite.center_y) +
-            "\nThrust X: " + str(self.player_thrust_x) +
-            "\nThrust Y: " + str(self.player_thrust_y) +
-            "\nTotal Thrust: " + str(math.sqrt(self.player_thrust_y *  self.player_thrust_y + self.player_thrust_x * self.player_thrust_x )) +
-            "\nShip Angle: " + str(self.player_sprite.angle) +
+            # "Coordinates: " + str(self.world_map_sprite.center_x) + ", " + str(0 - self.world_map_sprite.center_y) +
+            # "\nThrust X: " + str(self.player_thrust_x) +
+            # "\nThrust Y: " + str(self.player_thrust_y) +
+            # "\nTotal Thrust: " + str(math.sqrt(self.player_thrust_y *  self.player_thrust_y + self.player_thrust_x * self.player_thrust_x )) +
+            # "\nShip Angle: " + str(self.player_sprite.angle) +
             "\nFPS: " + str(self.fps) +
             "\nFrames: " + str(self.frames),
             # Location, color & size
