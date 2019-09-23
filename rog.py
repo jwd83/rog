@@ -8,7 +8,7 @@ http://arcade.academy/examples/starting_template.html#starting-template
 """
 
 # standard libraries in alphabetical order
-import random
+import math
 import time
 
 # external libraries in alphabetical order
@@ -23,9 +23,10 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SCREEN_TITLE = "R.o.G."
 THRUST_MAX = 400
-THRUST_MIN = -100
-THRUST_ACCELERATION = 150
-SPIN_RATE = 200
+THRUST_MIN = -50
+THRUST_ACCELERATION = 25
+SPIN_RATE = 100
+
 
 class MyGame(arcade.Window):
     """
@@ -57,6 +58,8 @@ class MyGame(arcade.Window):
         self.player_location_y = 0
         self.player_thrust_value = 0
         self.player_thrust_angle = 0
+        self.player_thrust_x = 0
+        self.player_thrust_y = 0
 
         self.frames = 0
         self.last_fps_time = int(time.time())
@@ -91,18 +94,18 @@ class MyGame(arcade.Window):
         self.world_map_sprite = arcade.Sprite("images/jupiter.jpg")
         self.world_map_sprite.scale = 1
         self.world_map_list.append(self.world_map_sprite)
-
-        for i in range(15):
-            star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
-            star.center_y = random.randrange(0, SCREEN_HEIGHT)
-            star.center_x = random.randrange(0, SCREEN_WIDTH)
-            self.star_list.append(star)
-
-        for i in range(15):
-            star = arcade.Sprite("images/star_black.png", random.uniform(0.03, 0.15))
-            star.center_y = random.randrange(0, SCREEN_HEIGHT)
-            star.center_x = random.randrange(0, SCREEN_WIDTH)
-            self.star_list.append(star)
+        #
+        # for i in range(15):
+        #     star = arcade.Sprite("images/star_red.png", random.uniform(0.01, 0.06))
+        #     star.center_y = random.randrange(0, SCREEN_HEIGHT)
+        #     star.center_x = random.randrange(0, SCREEN_WIDTH)
+        #     self.star_list.append(star)
+        #
+        # for i in range(15):
+        #     star = arcade.Sprite("images/star_black.png", random.uniform(0.03, 0.15))
+        #     star.center_y = random.randrange(0, SCREEN_HEIGHT)
+        #     star.center_x = random.randrange(0, SCREEN_WIDTH)
+        #     self.star_list.append(star)
 
         # for i in range(15):
         #     star = arcade.Sprite("images/star_blue.png", random.uniform(0.01, 0.02))
@@ -121,7 +124,7 @@ class MyGame(arcade.Window):
 
         # Draw our sprite lists from bottom to top
         self.world_map_list.draw()
-        self.star_list.draw()
+        # self.star_list.draw()
         self.enemy_list.draw()
         self.player_list.draw()
 
@@ -148,25 +151,46 @@ class MyGame(arcade.Window):
         #         star.center_y = SCREEN_HEIGHT + 100
         #         star.center_x = random.randrange(0, SCREEN_WIDTH)
 
-        if self.up_pressed:
-            self.player_thrust_value += delta_time * THRUST_ACCELERATION
-
-        if self.down_pressed:
-            self.player_thrust_value -= delta_time * THRUST_ACCELERATION
-
+        # re-angle ship and constrain the angle as 0-360
         if self.left_pressed:
             self.player_sprite.angle += delta_time * SPIN_RATE
-
         if self.right_pressed:
             self.player_sprite.angle -= delta_time * SPIN_RATE
+        if self.player_sprite.angle < 0:
+            self.player_sprite.angle += 360
+        if self.player_sprite.angle > 360:
+            self.player_sprite.angle -= 360
 
-        if self.player_thrust_value > THRUST_MAX:
-            self.player_thrust_value = THRUST_MAX
+        # calculate new thrust contribution
+        if self.up_pressed or self.down_pressed:
+            thrust_contribution = delta_time * THRUST_ACCELERATION
+            if self.down_pressed:
+                thrust_contribution *= -1
+            thrust_angle = self.player_sprite.angle + 90
+            if thrust_angle < 0:
+                thrust_angle += 360
+            if thrust_angle > 360:
+                thrust_angle -= 360
 
-        if self.player_thrust_value < THRUST_MIN:
-            self.player_thrust_value = THRUST_MIN
+            thrust_component_x = math.cos(math.radians(180 - thrust_angle)) * thrust_contribution
+            thrust_component_y = math.sin(math.radians(180 -thrust_angle)) * thrust_contribution
 
-        self.world_map_sprite.center_y -= self.player_thrust_value * delta_time
+            self.player_thrust_x += thrust_component_x
+            self.player_thrust_y += thrust_component_y
+
+        #
+        #
+        # if self.player_thrust_value > THRUST_MAX:
+        #     self.player_thrust_value = THRUST_MAX
+        #
+        # if self.player_thrust_value < THRUST_MIN:
+        #     self.player_thrust_value = THRUST_MIN
+
+        # apply thrust movement
+
+        # needs to be rewritten to use thrust value and angle
+        self.world_map_sprite.center_x += self.player_thrust_x
+        self.world_map_sprite.center_y -= self.player_thrust_y
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -234,8 +258,20 @@ class MyGame(arcade.Window):
             self.last_fps_frames = self.frames
 
         # Draw our FPS data
-        arcade.draw_text("Thrust: " + str(self.player_thrust_value) + "\nFPS: " + str(self.fps) + "\nFrames: " + str(self.frames), self.fps_x, self.fps_y,
-                         arcade.color.WHITE, 12)
+        arcade.draw_text(
+            # Text
+            "Coordinates: " + str(self.world_map_sprite.center_x) + ", " + str(0 - self.world_map_sprite.center_y) +
+            "\nThrust X: " + str(self.player_thrust_x) +
+            "\nThrust Y: " + str(self.player_thrust_y) +
+            "\nTotal Thrust: " + str(math.sqrt(self.player_thrust_y *  self.player_thrust_y + self.player_thrust_x * self.player_thrust_x )) +
+            "\nShip Angle: " + str(self.player_sprite.angle) +
+            "\nFPS: " + str(self.fps) +
+            "\nFrames: " + str(self.frames),
+            # Location, color & size
+            self.fps_x, self.fps_y,
+            arcade.color.WHITE,
+            14
+        )
 
     def draw_reticle(self):
         # Draw a point at the target
@@ -252,3 +288,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
