@@ -25,7 +25,7 @@ SCREEN_HEIGHT = 720
 SCREEN_TITLE = "R.o.G."
 THRUST_MAX = 400
 THRUST_MIN = -50
-THRUST_ACCELERATION = 10
+THRUST_ACCELERATION = 250
 SPIN_RATE = 125
 
 
@@ -77,6 +77,7 @@ class MyGame(arcade.Window):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
+        self.b_pressed = False
 
     def setup(self):
         # Create your sprites and sprite lists here
@@ -173,9 +174,15 @@ class MyGame(arcade.Window):
         if self.player_sprite.angle > 360:
             self.player_sprite.angle -= 360
 
+        if self.b_pressed:
+            self.world_map_sprite.center_x = 0
+            self.world_map_sprite.center_y = 0
+            self.player_thrust_x = 0
+            self.player_thrust_y = 0
+
         # calculate new thrust contribution
         if self.up_pressed or self.down_pressed:
-            thrust_contribution = delta_time * THRUST_ACCELERATION
+            thrust_contribution = THRUST_ACCELERATION * delta_time
             if self.down_pressed:
                 thrust_contribution *= -1
             thrust_angle = self.player_sprite.angle + 90
@@ -190,8 +197,8 @@ class MyGame(arcade.Window):
             self.player_thrust_x += thrust_component_x
             self.player_thrust_y += thrust_component_y
 
-        self.world_map_sprite.center_x += self.player_thrust_x
-        self.world_map_sprite.center_y -= self.player_thrust_y
+        self.world_map_sprite.center_x += self.player_thrust_x * delta_time
+        self.world_map_sprite.center_y -= self.player_thrust_y * delta_time
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -209,6 +216,8 @@ class MyGame(arcade.Window):
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
             self.right_pressed = True
+        elif key == arcade.key.B:
+            self.b_pressed = True
 
     def on_key_release(self, key, key_modifiers):
         """
@@ -222,6 +231,8 @@ class MyGame(arcade.Window):
             self.left_pressed = False
         elif key == arcade.key.RIGHT:
             self.right_pressed = False
+        elif key == arcade.key.B:
+            self.b_pressed = False
 
     def on_mouse_motion(self, x, y, delta_x, delta_y):
         """
